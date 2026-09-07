@@ -600,6 +600,159 @@
     text-overflow: ellipsis;
   }
 
+  /* -- HISTORY -- */
+  #history-view {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    padding: 1.2rem 1.5rem 2rem;
+    gap: 1rem;
+    overflow-y: auto;
+  }
+
+  .history-summary {
+    background: rgba(26, 29, 54, 0.55);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: 14px;
+    padding: 1rem 1.2rem;
+  }
+
+  .history-summary-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.6rem;
+  }
+
+  .history-count {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--white);
+  }
+
+  .history-count span {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-pale);
+    opacity: 0.75;
+    margin-left: 0.4rem;
+  }
+
+  .history-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.85;
+    margin-bottom: 0.35rem;
+  }
+
+  .history-repeat {
+    font-size: 0.78rem;
+    color: var(--white-dim);
+    line-height: 1.7;
+  }
+
+  .history-repeat b {
+    color: var(--white);
+    font-weight: 400;
+  }
+
+  .history-day {
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-pale);
+    opacity: 0.7;
+    margin: 0.6rem 0 0.1rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.16);
+  }
+
+  .history-entry {
+    display: flex;
+    gap: 0.7rem;
+    padding: 0.7rem 0 0.5rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.08);
+  }
+
+  .history-thumb {
+    width: 42px;
+    flex: 0 0 42px;
+    border-radius: 4px;
+    cursor: pointer;
+    background: rgba(212, 175, 55, 0.08);
+  }
+
+  .history-body { flex: 1; min-width: 0; }
+
+  .history-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.88rem;
+    color: var(--white);
+    cursor: pointer;
+  }
+
+  .history-meta {
+    font-size: 0.66rem;
+    color: var(--white-dim);
+    opacity: 0.6;
+    margin-bottom: 0.35rem;
+  }
+
+  .history-note {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed rgba(212, 175, 55, 0.25);
+    padding: 0.2rem 0;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.76rem;
+    color: var(--gold-pale);
+    outline: none;
+  }
+
+  .history-note::placeholder { color: rgba(201, 188, 163, 0.28); font-style: italic; }
+  .history-note:focus { border-bottom-color: var(--gold); }
+
+  .history-empty {
+    text-align: center;
+    color: var(--white-dim);
+    opacity: 0.6;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    padding: 2.5rem 1rem;
+  }
+
+  .history-actions {
+    display: flex;
+    gap: 0.6rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+  }
+
+  .history-actions .btn { padding: 0.6rem 1.2rem; font-size: 0.72rem; }
+
+  .history-actions .btn-danger {
+    background: rgba(140, 58, 39, 0.9);
+    border-color: #c0563a;
+    color: var(--white);
+  }
+
+  .history-hint {
+    font-size: 0.62rem;
+    color: var(--white-dim);
+    opacity: 0.45;
+    text-align: center;
+    line-height: 1.6;
+  }
+
   /* -- NAV BAR -- */
   nav {
     display: flex;
@@ -948,7 +1101,7 @@
       <span>Tap card to reveal</span>
     </div>
 
-    <div class="card-view-actions">
+    <div class="card-view-actions" id="card-view-actions">
       <button class="btn btn-primary" onclick="drawCard()">Draw Another</button>
       <button class="btn btn-secondary" onclick="showDeck()">Back to Deck</button>
     </div>
@@ -962,6 +1115,18 @@
     </div>
     <div class="category-tabs" id="cat-tabs"></div>
     <div class="cards-grid" id="cards-grid"></div>
+  </div>
+
+  <!-- HISTORY VIEW -->
+  <div id="history-view">
+    <div class="history-summary" id="history-summary"></div>
+    <div class="history-list" id="history-list"></div>
+    <div class="history-actions">
+      <button type="button" class="btn btn-secondary" onclick="exportHistory(this)">Copy my journal</button>
+      <button type="button" class="btn btn-secondary" onclick="clearHistory(this)">Clear</button>
+    </div>
+    <p class="history-hint">Saved on this device only. Clearing your browser data erases it —
+      use Copy my journal to keep a permanent record.</p>
   </div>
 
   <!-- 3-CARD SPREAD VIEW -->
@@ -996,6 +1161,10 @@
     <button class="nav-btn" id="nav-all" onclick="switchView('all')">
       <span class="nav-icon">🗂</span>
       <span class="nav-label">All Cards</span>
+    </button>
+    <button class="nav-btn" id="nav-history" onclick="switchView('history')">
+      <span class="nav-icon">📖</span>
+      <span class="nav-label">Journal</span>
     </button>
   </nav>
 </div>
@@ -1075,7 +1244,19 @@ let shuffledDeck = [...CARDS];
 let drawnIndex = 0;
 let currentCard = null;
 let currentView = 'deck';
+let cardOrigin = 'deck';          // deck | spread | all
 const STORE = 'voa_';
+
+const preloaded = {};
+
+function preload(cards) {
+  cards.forEach(c => {
+    if (!c || preloaded[c.id]) return;
+    const img = new Image();
+    img.src = c.id + '.webp';
+    preloaded[c.id] = img;
+  });
+}
 
 function shuffleArray(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -1119,6 +1300,7 @@ document.getElementById('code-input').addEventListener('keydown', function(e) {
 function initDeck() {
   shuffledDeck = shuffleArray([...CARDS]);
   drawnIndex = 0;
+  preload(shuffledDeck.slice(0, 3));
   [updateCounter, buildCategoryTabs, () => buildAllCards(CARDS), initSpread]
     .forEach(step => { try { step(); } catch (e) { console.error('init step failed:', e); } });
 }
@@ -1137,23 +1319,55 @@ function switchView(view) {
   document.getElementById('card-view').style.display = 'none';
   document.getElementById('all-cards-view').style.display = 'none';
   document.getElementById('spread-view').style.display = 'none';
+  document.getElementById('history-view').style.display = 'none';
 
   if (view === 'deck') {
     document.getElementById('deck-view').style.display = 'flex';
     document.getElementById('nav-deck').classList.add('active');
   } else if (view === 'card') {
     document.getElementById('card-view').style.display = 'flex';
-    document.getElementById('nav-deck').classList.add('active');
+    updateCardActions();
+    const navId = cardOrigin === 'spread' ? 'nav-spread'
+                : cardOrigin === 'all' ? 'nav-all'
+                : cardOrigin === 'history' ? 'nav-history' : 'nav-deck';
+    document.getElementById(navId).classList.add('active');
   } else if (view === 'all') {
     document.getElementById('all-cards-view').style.display = 'flex';
     document.getElementById('nav-all').classList.add('active');
   } else if (view === 'spread') {
     document.getElementById('spread-view').style.display = 'flex';
     document.getElementById('nav-spread').classList.add('active');
+  } else if (view === 'history') {
+    document.getElementById('history-view').style.display = 'flex';
+    document.getElementById('nav-history').classList.add('active');
+    renderHistory();
   }
 }
 
 function showDeck() { switchView('deck'); }
+
+function updateCardActions() {
+  const box = document.getElementById('card-view-actions');
+  box.innerHTML = '';
+  const add = (label, cls, fn) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn ' + cls;
+    b.textContent = label;
+    b.onclick = fn;
+    box.appendChild(b);
+  };
+  if (cardOrigin === 'spread') {
+    add('← Back to the Spread', 'btn-primary', () => switchView('spread'));
+  } else if (cardOrigin === 'all') {
+    add('← Back to All Cards', 'btn-primary', () => switchView('all'));
+  } else if (cardOrigin === 'history') {
+    add('← Back to the Journal', 'btn-primary', () => switchView('history'));
+  } else {
+    add('Draw Another', 'btn-primary', drawCard);
+    add('Back to Deck', 'btn-secondary', showDeck);
+  }
+}
 
 // -- SHUFFLE --
 function shuffleDeck() {
@@ -1162,6 +1376,7 @@ function shuffleDeck() {
   setTimeout(() => { pile.classList.remove('shuffling'); }, 1800);
   shuffledDeck = shuffleArray([...CARDS]);
   drawnIndex = 0;
+  preload(shuffledDeck.slice(0, 3));
   updateCounter();
 }
 
@@ -1172,6 +1387,8 @@ function drawCard() {
     drawnIndex = 0;
   }
   currentCard = shuffledDeck[drawnIndex++];
+  cardOrigin = 'deck';
+  preload(shuffledDeck.slice(drawnIndex, drawnIndex + 3));
   updateCounter();
   showCardUnrevealed(currentCard);
   document.getElementById('drawn-count').textContent = `Card ${drawnIndex} of ${CARDS.length}`;
@@ -1229,6 +1446,7 @@ function flipCard() {
   cardRevealed = true;
   document.getElementById('card-back-el').style.display = 'none';
   document.getElementById('card-face').style.display = 'block';
+  if (cardOrigin === 'deck') logDraw(currentCard, 'Daily draw');
   renderReadingPanel(currentCard);
 }
 
@@ -1279,7 +1497,7 @@ function buildAllCards(cards) {
   cards.forEach(card => {
     const el = document.createElement('div');
     el.className = 'mini-card';
-    el.onclick = () => openCardFromList(card);
+    el.onclick = () => openCardFromList(card, 'all');
     el.innerHTML = `
       <div class="mini-card-num">#${card.id} · ${CATEGORIES[card.cat]}</div>
       <div class="mini-card-name">${card.name}</div>
@@ -1289,12 +1507,185 @@ function buildAllCards(cards) {
   });
 }
 
-function openCardFromList(card) {
+function openCardFromList(card, origin) {
   currentCard = card;
+  cardOrigin = origin || 'all';
   showCardUnrevealed(card);
   document.getElementById('drawn-count').textContent = `Card #${card.id}`;
   switchView('card');
   flipCard();
+}
+
+// -- DRAW JOURNAL (localStorage) --
+const HKEY = STORE + 'history';
+
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(HKEY) || '[]'); }
+  catch (e) { return []; }
+}
+
+function saveHistory(h) {
+  try { localStorage.setItem(HKEY, JSON.stringify(h.slice(-300))); }
+  catch (e) { console.error('journal save failed:', e); }
+}
+
+function logDraw(card, context) {
+  if (!card) return;
+  const h = loadHistory();
+  const last = h[h.length - 1];
+  const now = Date.now();
+  // ignore an identical entry within a few seconds (double taps, re-flips)
+  if (last && last.id === card.id && last.context === context && now - last.t < 5000) return;
+  h.push({ t: now, id: card.id, name: card.name, context: context, note: '' });
+  saveHistory(h);
+}
+
+function dayLabel(ts) {
+  const d = new Date(ts), t = new Date();
+  const same = (a, b) => a.toDateString() === b.toDateString();
+  const y = new Date(t.getTime() - 86400000);
+  if (same(d, t)) return 'Today';
+  if (same(d, y)) return 'Yesterday';
+  return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function timeLabel(ts) {
+  return new Date(ts).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+}
+
+function renderHistory() {
+  const h = loadHistory();
+  const sum = document.getElementById('history-summary');
+  const list = document.getElementById('history-list');
+
+  if (!h.length) {
+    sum.style.display = 'none';
+    list.innerHTML = '<p class="history-empty">Nothing written down yet.<br>' +
+      'Every card you draw is recorded here on its own.</p>';
+    return;
+  }
+  sum.style.display = 'block';
+
+  const counts = {};
+  h.forEach(e => { counts[e.name] = (counts[e.name] || 0) + 1; });
+  const repeats = Object.keys(counts).filter(n => counts[n] > 1)
+    .sort((a, b) => counts[b] - counts[a]).slice(0, 3);
+
+  sum.innerHTML =
+    '<div class="history-summary-top">' +
+      '<div class="history-count">' + h.length + '<span>draws</span></div>' +
+      '<div class="history-count">' + Object.keys(counts).length + '<span>cards seen</span></div>' +
+    '</div>' +
+    (repeats.length
+      ? '<div class="history-label">Cards that keep returning</div><div class="history-repeat">' +
+        repeats.map(n => '<b>' + n + '</b> · ' + counts[n] + ' times').join('<br>') + '</div>'
+      : '<div class="history-repeat" style="opacity:0.6">No card has repeated yet.</div>');
+
+  let html = '', lastDay = '';
+  h.slice().reverse().forEach(e => {
+    const d = dayLabel(e.t);
+    if (d !== lastDay) { html += '<div class="history-day">' + d + '</div>'; lastDay = d; }
+    const note = (e.note || '').replace(/"/g, '&quot;');
+    html +=
+      '<div class="history-entry">' +
+        '<img class="history-thumb" src="' + e.id + '.webp" alt="" data-card="' + e.id + '">' +
+        '<div class="history-body">' +
+          '<div class="history-name" data-card="' + e.id + '">' + e.name + '</div>' +
+          '<div class="history-meta">' + timeLabel(e.t) + ' · ' + e.context + '</div>' +
+          '<input class="history-note" data-t="' + e.t + '" value="' + note + '"' +
+                ' placeholder="What did it mean for you?">' +
+        '</div>' +
+      '</div>';
+  });
+  list.innerHTML = html;
+  list.querySelectorAll('.history-thumb').forEach(img => {
+    img.onerror = function () { this.style.visibility = 'hidden'; };
+  });
+}
+
+// notes save as they are typed; thumbnails and names open the full reading
+document.getElementById('history-list').addEventListener('change', function (e) {
+  const inp = e.target.closest('.history-note');
+  if (!inp) return;
+  const t = Number(inp.dataset.t);
+  const h = loadHistory();
+  const row = h.find(x => x.t === t);
+  if (row) { row.note = inp.value; saveHistory(h); }
+});
+
+document.getElementById('history-list').addEventListener('click', function (e) {
+  const el = e.target.closest('[data-card]');
+  if (!el) return;
+  const card = CARDS.find(c => c.id === Number(el.dataset.card));
+  if (card) openCardFromList(card, 'history');
+});
+
+const NL = String.fromCharCode(10);
+
+function exportHistory(btn) {
+  const h = loadHistory();
+  if (!h.length) return;
+  const lines = ['VOICES OF THE ANCESTORS ORACLE — MY DRAW JOURNAL', ''];
+  let lastDay = '';
+  h.forEach(e => {
+    const d = dayLabel(e.t);
+    if (d !== lastDay) { lines.push('', d.toUpperCase()); lastDay = d; }
+    lines.push('  ' + timeLabel(e.t) + '  ' + e.name + '  (' + e.context + ')');
+    if (e.note) lines.push('      ' + e.note);
+  });
+  const text = lines.join(NL);
+  const done = () => {
+    if (!btn) return;
+    const old = btn.dataset.label || btn.textContent;
+    btn.dataset.label = old;
+    btn.textContent = 'Copied ✓';
+    setTimeout(() => { btn.textContent = old; }, 1800);
+  };
+  try {
+    navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done));
+  } catch (err) { fallbackCopy(text, done); }
+}
+
+function fallbackCopy(text, done) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); done(); } catch (e) {}
+  document.body.removeChild(ta);
+}
+
+let clearArmed = null;
+
+function clearHistory(btn) {
+  if (!loadHistory().length) return;
+  if (!btn) { doClear(); return; }
+
+  if (!clearArmed) {                       // first tap: ask for confirmation in place
+    btn.dataset.label = btn.dataset.label || btn.textContent;
+    btn.textContent = 'Tap again to erase';
+    btn.classList.add('btn-danger');
+    clearArmed = setTimeout(() => { resetClearButton(btn); }, 5000);
+    return;
+  }
+  resetClearButton(btn);                   // second tap: do it
+  doClear();
+}
+
+function resetClearButton(btn) {
+  clearTimeout(clearArmed);
+  clearArmed = null;
+  if (btn) {
+    btn.textContent = btn.dataset.label || 'Clear';
+    btn.classList.remove('btn-danger');
+  }
+}
+
+function doClear() {
+  try { localStorage.removeItem(HKEY); } catch (e) { console.error('clear failed:', e); }
+  renderHistory();
 }
 
 // -- SPREADS --
@@ -1444,6 +1835,7 @@ function newSpread() {
     spreadCards = shuffleArray([...CARDS]).slice(0, n);
   }
   spreadRevealed = new Array(n).fill(false);
+  preload(spreadCards);
   document.getElementById('spread-title').textContent = sp.title;
   document.getElementById('spread-subtitle').textContent = sp.sub;
   document.getElementById('spread-note').textContent = sp.note;
@@ -1481,11 +1873,15 @@ function renderSpread() {
         <div class="spread-slot-name">${card.name}</div>
         <div class="spread-slot-read">Tap for the reading →</div>
       `;
-      slot.onclick = () => openCardFromList(card);
+      slot.onclick = () => openCardFromList(card, 'spread');
     } else {
       slot.className = 'spread-card-slot unrevealed';
       slot.innerHTML = `<img src="card_back.webp" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="this.outerHTML='<span class=&quot;spread-mark&quot;>✦</span>';">`;
-      slot.onclick = () => { spreadRevealed[i] = true; renderSpread(); };
+      slot.onclick = () => {
+        spreadRevealed[i] = true;
+        logDraw(spreadCards[i], sp.title + ' · ' + sp.positions[i].name);
+        renderSpread();
+      };
     }
     grid.appendChild(slot);
   });
