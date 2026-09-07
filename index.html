@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#121212">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Voices of the Ancestors">
+<title>Voices of the Ancestors Oracle</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #121212;
+    --bg2: #1a1916;
+    --indigo: #1A1D36;
+    --indigo-deep: #12142a;
+    --terracotta: #8C3A27;
+    --gold: #D4AF37;
+    --gold-glow: #f0cc61;
+    --gold-soft: #b08a3e;
+    --gold-pale: #e6d3a3;
+    --white: #F4EBD9;
+    --white-dim: #c9bca3;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Jost', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* -- ACCESS SCREEN -- */
+  #access-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    background: radial-gradient(ellipse at 50% 40%, #26241d 0%, var(--bg) 70%);
+    text-align: center;
+  }
+
+  .lock-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    filter: drop-shadow(0 0 20px var(--gold));
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { filter: drop-shadow(0 0 15px var(--gold-soft)); transform: scale(1); }
+    50% { filter: drop-shadow(0 0 35px var(--gold-glow)); transform: scale(1.05); }
+  }
+
+  #access-screen h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    letter-spacing: 0.05em;
+    color: var(--white);
+    margin-bottom: 0.4rem;
+  }
+
+  #access-screen .subtitle {
+    font-size: 0.85rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold-pale);
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+  }
+
+  .access-box {
+    background: rgba(26, 29, 54, 0.55);
+    border: 1px solid rgba(212, 175, 55, 0.28);
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    max-width: 380px;
+    width: 100%;
+    backdrop-filter: blur(10px);
+  }
+
+  .access-box label {
+    display: block;
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-pale);
+    margin-bottom: 0.8rem;
+  }
+
+  .access-box input {
+    width: 100%;
+    background: rgba(18, 18, 18, 0.85);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    border-radius: 8px;
+    padding: 0.9rem 1.2rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.3em;
+    color: var(--white);
+    text-align: center;
+    text-transform: uppercase;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    margin-bottom: 1.2rem;
+  }
+
+  .access-box input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.22);
+  }
+
+  .btn-enter {
+    width: 100%;
+    background: linear-gradient(135deg, var(--gold-soft) 0%, var(--terracotta) 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 0.9rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-enter:hover {
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.45);
+    transform: translateY(-1px);
+  }
+
+  .error-msg {
+    color: #e08a6f;
+    font-size: 0.8rem;
+    margin-top: 0.8rem;
+    display: none;
+  }
+
+  .access-footer {
+    margin-top: 2rem;
+    font-size: 0.75rem;
+    color: rgba(201, 188, 163, 0.4);
+    letter-spacing: 0.1em;
+  }
+
+  /* -- MAIN APP -- */
+  #app {
+    display: none;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(180deg, var(--indigo) 0%, transparent 100%);
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1rem, 3vw, 1.3rem);
+    letter-spacing: 0.06em;
+    color: var(--white);
+  }
+
+  header .deck-badge {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--gold-pale);
+    text-transform: uppercase;
+    display: block;
+    font-weight: 300;
+  }
+
+  .card-counter {
+    font-size: 0.75rem;
+    color: var(--gold-pale);
+    letter-spacing: 0.1em;
+    background: rgba(212, 175, 55, 0.1);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+  }
+
+  /* -- DECK VIEW -- */
+  #deck-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    gap: 2rem;
+  }
+
+  .deck-pile {
+    position: relative;
+    width: 200px;
+    height: 346px;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+
+  .deck-pile:hover { transform: scale(1.03) translateY(-4px); }
+
+  .deck-card {
+    position: absolute;
+    width: 200px;
+    height: 346px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #f4ebd9 0%, #e6d3a3 60%, #c9ab6d 100%);
+    border: 2px solid rgba(212, 175, 55, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .deck-card:nth-child(1) { transform: rotate(-6deg) translate(-12px, 10px); opacity: 0.45; filter: brightness(0.75); }
+  .deck-card:nth-child(2) { transform: rotate(-3deg) translate(-6px, 5px); opacity: 0.65; filter: brightness(0.85); }
+  .deck-card:nth-child(3) { transform: rotate(3deg) translate(6px, 3px); opacity: 0.8; filter: brightness(0.92); }
+  .deck-card:nth-child(4) { transform: rotate(0deg); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 40px rgba(212, 175, 55, 0.28); }
+
+  .deck-mark {
+    font-size: 3.2rem;
+    color: #2a2418;
+    opacity: 0.7;
+  }
+
+  .deck-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1.8rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--gold-soft) 0%, var(--terracotta) 100%);
+    color: var(--white);
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.22);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 4px 30px rgba(212, 175, 55, 0.45);
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background: rgba(26, 29, 54, 0.6);
+    color: var(--gold-pale);
+    border: 1px solid rgba(212, 175, 55, 0.32);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(26, 29, 54, 0.85);
+    border-color: var(--gold);
+  }
+
+  .deck-hint {
+    font-size: 0.8rem;
+    color: var(--white-dim);
+    letter-spacing: 0.05em;
+    opacity: 0.6;
+  }
+
+  /* -- DRAWN CARD -- */
+  #card-view {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1.5rem 2rem;
+    gap: 1.5rem;
+  }
+
+  .card-scene {
+    perspective: 1000px;
+    width: min(320px, 85vw);
+    cursor: pointer;
+  }
+
+  .card-inner {
+    width: 100%;
+    position: relative;
+    transition: transform 0.15s ease;
+  }
+
+  .card-inner:active { transform: scale(0.97); }
+
+  .card-face, .card-back {
+    width: 100%;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 0 50px rgba(212, 175, 55, 0.22);
+    border: 2px solid rgba(212, 175, 55, 0.5);
+  }
+
+  .card-back {
+    aspect-ratio: 0.579;
+    background: linear-gradient(145deg, #f4ebd9 0%, #e6d3a3 60%, #c9ab6d 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    position: relative;
+  }
+
+  .card-back.has-image { background: none; padding: 0; }
+
+  .card-back.has-image img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  .card-back.has-image .mark-large,
+  .card-back.has-image .tap-hint { display: none; }
+
+  .card-back .mark-large {
+    font-size: 4.5rem;
+    color: #2a2418;
+    opacity: 0.75;
+  }
+
+  .card-back .tap-hint {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(42, 36, 24, 0.6);
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  .card-face {
+    display: none;
+    position: relative;
+    background: #000;
+  }
+
+  .card-face img { width: 100%; display: block; }
+
+  /* -- Reading panel -- */
+  .reading-hint {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold-pale);
+    opacity: 0.65;
+    text-align: center;
+  }
+
+  .reading-panel {
+    width: min(320px, 85vw);
+    background: rgba(26, 29, 54, 0.55);
+    border: 1px solid rgba(212, 175, 55, 0.28);
+    border-radius: 16px;
+    padding: 1.4rem 1.4rem 1.2rem;
+    backdrop-filter: blur(8px);
+  }
+
+  .reading-category {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.85;
+    text-align: center;
+    margin-bottom: 0.2rem;
+    font-weight: 500;
+  }
+
+  .reading-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.15rem, 4.5vw, 1.5rem);
+    color: var(--white);
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .reading-keywords {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.75rem;
+    color: var(--gold-pale);
+    opacity: 0.85;
+    text-align: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.22);
+  }
+
+  .card-section-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-pale);
+    opacity: 0.7;
+    margin-bottom: 0.25rem;
+    margin-top: 0.9rem;
+  }
+
+  .card-section-label:first-of-type { margin-top: 0; }
+
+  .card-message {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--white);
+    font-style: italic;
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+  }
+
+  .card-meaning {
+    font-size: 0.78rem;
+    line-height: 1.55;
+    color: var(--white-dim);
+    opacity: 0.9;
+  }
+
+  .card-reflection {
+    font-size: 0.78rem;
+    line-height: 1.55;
+    color: var(--gold-pale);
+    border-left: 2px solid var(--gold);
+    padding-left: 0.75rem;
+    margin-top: 0.3rem;
+  }
+
+  .card-affirmation {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--white);
+    text-align: center;
+    margin-top: 1rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid rgba(212, 175, 55, 0.22);
+  }
+
+  .card-footer-brand {
+    margin-top: 1rem;
+    padding-top: 0.8rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(201, 188, 163, 0.3);
+    text-align: center;
+  }
+
+  .card-view-actions {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .card-info-bar {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.75rem;
+    color: var(--white-dim);
+    opacity: 0.6;
+  }
+
+  /* -- ALL CARDS VIEW -- */
+  #all-cards-view {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  .search-bar {
+    padding: 1rem 1.5rem;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+  }
+
+  .search-bar input {
+    width: 100%;
+    background: rgba(26, 29, 54, 0.5);
+    border: 1px solid rgba(212, 175, 55, 0.28);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.85rem;
+    color: var(--white);
+    outline: none;
+  }
+
+  .search-bar input::placeholder { color: rgba(201, 188, 163, 0.35); }
+
+  .category-tabs {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .category-tabs::-webkit-scrollbar { display: none; }
+
+  .cat-tab {
+    white-space: nowrap;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    color: var(--white-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    font-family: 'Jost', sans-serif;
+  }
+
+  .cat-tab.active, .cat-tab:hover {
+    background: rgba(212, 175, 55, 0.18);
+    border-color: var(--gold);
+    color: var(--white);
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    padding: 1rem 1.5rem 2rem;
+    overflow-y: auto;
+  }
+
+  .mini-card {
+    background: rgba(26, 29, 54, 0.6);
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+
+  .mini-card:hover {
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.18);
+    transform: translateY(-2px);
+  }
+
+  .mini-card-num {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    margin-bottom: 0.3rem;
+  }
+
+  .mini-card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+
+  .mini-card-truth {
+    font-size: 0.75rem;
+    color: var(--white-dim);
+    opacity: 0.7;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* -- NAV BAR -- */
+  nav {
+    display: flex;
+    background: rgba(18, 18, 18, 0.95);
+    border-top: 1px solid rgba(212, 175, 55, 0.15);
+    padding: 0.5rem 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    backdrop-filter: blur(10px);
+  }
+
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Jost', sans-serif;
+  }
+
+  .nav-btn .nav-icon { font-size: 1.3rem; }
+
+  .nav-btn .nav-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(201, 188, 163, 0.4);
+  }
+
+  .nav-btn.active .nav-label, .nav-btn:hover .nav-label { color: var(--gold-pale); }
+
+  .nav-btn.active .nav-icon { filter: drop-shadow(0 0 6px var(--gold)); }
+
+  /* -- ANIMATIONS -- */
+  @keyframes shuffle {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    20%  { transform: translate(-15px, -5px) rotate(-5deg); }
+    40%  { transform: translate(15px, -8px) rotate(5deg); }
+    60%  { transform: translate(-8px, 5px) rotate(-2deg); }
+    80%  { transform: translate(8px, 3px) rotate(3deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+  }
+
+  .shuffling .deck-card:nth-child(4) { animation: shuffle 0.6s ease-in-out 3; }
+
+  @keyframes drawCard {
+    0%   { transform: translateY(0) scale(1); opacity: 1; }
+    50%  { transform: translateY(-80px) scale(1.1); opacity: 0.8; }
+    100% { transform: translateY(0) scale(1); opacity: 0; }
+  }
+
+  .drawing .deck-pile { animation: drawCard 0.5s ease-in-out forwards; }
+
+  /* -- SPREAD VIEW -- */
+  #spread-view {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+    gap: 1.5rem;
+    overflow-y: auto;
+  }
+
+  .spread-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--white);
+    text-align: center;
+  }
+
+  .spread-subtitle {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold-pale);
+    opacity: 0.7;
+    text-align: center;
+    margin-top: -1rem;
+  }
+
+  .spread-picker {
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .spread-picker-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--gold-pale);
+    opacity: 0.8;
+  }
+
+  .spread-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
+  }
+
+  .spread-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
+    user-select: none;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    padding: 0.5rem 0.95rem;
+    border-radius: 22px;
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    background: rgba(26, 29, 54, 0.55);
+    color: var(--white-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .spread-tab-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.18);
+    color: var(--gold-pale);
+    font-size: 0.64rem;
+    line-height: 1;
+  }
+
+  .spread-tab:hover {
+    border-color: var(--gold);
+    color: var(--white);
+    transform: translateY(-1px);
+  }
+
+  .spread-tab.active {
+    background: linear-gradient(135deg, rgba(176, 138, 62, 0.85) 0%, rgba(140, 58, 39, 0.85) 100%);
+    border-color: var(--gold);
+    color: var(--white);
+    box-shadow: 0 2px 14px rgba(212, 175, 55, 0.28);
+  }
+
+  .spread-tab.active .spread-tab-num {
+    background: rgba(18, 18, 18, 0.35);
+    color: var(--white);
+  }
+
+  .spread-note {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.78rem;
+    color: var(--white-dim);
+    opacity: 0.7;
+    text-align: center;
+    max-width: 460px;
+    line-height: 1.5;
+    margin-top: -0.6rem;
+  }
+
+  .spread-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .spread-card-slot {
+    aspect-ratio: 0.579;
+    border-radius: 10px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s;
+  }
+
+  .spread-card-slot.unrevealed {
+    background: linear-gradient(145deg, #f4ebd9 0%, #e6d3a3 60%, #c9ab6d 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .spread-card-slot.unrevealed:hover {
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+    transform: translateY(-3px);
+  }
+
+  .spread-card-slot.revealed {
+    aspect-ratio: auto;
+    background: linear-gradient(160deg, var(--indigo) 0%, var(--bg) 100%);
+    border-color: rgba(212, 175, 55, 0.45);
+    padding: 0.55rem 0.5rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .spread-slot-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.3rem;
+  }
+
+  .spread-slot-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.7rem;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 0.3rem;
+  }
+
+  .spread-slot-hint {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.56rem;
+    color: var(--white-dim);
+    opacity: 0.55;
+    line-height: 1.25;
+    margin-bottom: 0.3rem;
+  }
+
+  .spread-slot-truth {
+    font-size: 0.6rem;
+    color: var(--white-dim);
+    opacity: 0.75;
+    line-height: 1.3;
+    flex: 1;
+  }
+
+  .spread-mark { font-size: 1.6rem; color: #2a2418; opacity: 0.6; }
+
+  .spread-positions {
+    font-size: 0.72rem;
+    color: var(--white-dim);
+    opacity: 0.6;
+    text-align: center;
+    line-height: 2;
+  }
+</style>
+</head>
+<body>
+
+<!-- ACCESS SCREEN -->
+<div id="access-screen">
+  <div class="lock-icon">🕯️</div>
+  <h1>Voices of the Ancestors</h1>
+  <p class="subtitle">Oracle · Lineage · Ancestral Wisdom</p>
+
+  <div class="access-box">
+    <label for="code-input">Enter Your Access Code</label>
+    <p style="font-size:0.7rem;color:rgba(230,211,163,0.5);text-align:center;margin-bottom:0.5rem;letter-spacing:0.1em;">Type your code then click Unlock</p>
+    <input type="text" id="code-input" placeholder="" maxlength="20"
+      autocomplete="off" autocorrect="off" spellcheck="false"
+      style="ime-mode:disabled;">
+    <button class="btn-enter" onclick="checkCode()">Unlock the Oracle</button>
+    <div class="error-msg" id="error-msg">✗ Invalid access code. Try again.</div>
+  </div>
+
+  <p class="access-footer">PsychicSoulStar · Voices of the Ancestors Oracle</p>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <header>
+    <div>
+      <span class="deck-badge">Ancestral Wisdom Oracle</span>
+      <h1>Voices of the Ancestors</h1>
+    </div>
+    <span class="card-counter" id="counter">60 Cards</span>
+  </header>
+
+  <!-- DECK VIEW -->
+  <div id="deck-view">
+    <div class="deck-pile" id="deck-pile" onclick="drawCard()">
+      <div class="deck-card"></div>
+      <div class="deck-card"></div>
+      <div class="deck-card"></div>
+      <div class="deck-card" style="overflow:hidden;display:flex;align-items:center;justify-content:center;">
+        <img src="card_back.webp" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <span class="deck-mark" style="display:none;">✦</span>
+      </div>
+    </div>
+    <div class="deck-actions">
+      <button class="btn btn-primary" onclick="shuffleDeck()">✦ Shuffle</button>
+      <button class="btn btn-secondary" onclick="drawCard()">Draw a Card</button>
+    </div>
+    <p class="deck-hint">Tap the deck or press Draw to reveal a card</p>
+  </div>
+
+  <!-- DRAWN CARD VIEW -->
+  <div id="card-view">
+    <div class="card-scene" id="card-scene" onclick="flipCard()">
+      <div class="card-inner" id="card-inner">
+        <div class="card-back has-image" id="card-back-el">
+          <img src="card_back.webp" alt="Voices of the Ancestors — card back" onerror="this.parentElement.classList.remove('has-image'); this.remove();">
+          <span class="mark-large">✦</span>
+          <span class="tap-hint">Tap to reveal</span>
+        </div>
+        <div class="card-face" id="card-face"></div>
+      </div>
+    </div>
+
+    <p class="reading-hint" id="reading-hint" style="display:none;">Scroll down for the full reading</p>
+
+    <div class="reading-panel" id="reading-panel" style="display:none;"></div>
+
+    <div class="card-info-bar">
+      <span id="drawn-count">Card drawn</span>
+      <span>·</span>
+      <span>Tap card to reveal</span>
+    </div>
+
+    <div class="card-view-actions">
+      <button class="btn btn-primary" onclick="drawCard()">Draw Another</button>
+      <button class="btn btn-secondary" onclick="showDeck()">Back to Deck</button>
+    </div>
+  </div>
+
+  <!-- ALL CARDS VIEW -->
+  <div id="all-cards-view">
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search cards..."
+        oninput="filterCards()" autocomplete="off">
+    </div>
+    <div class="category-tabs" id="cat-tabs"></div>
+    <div class="cards-grid" id="cards-grid"></div>
+  </div>
+
+  <!-- 3-CARD SPREAD VIEW -->
+  <div id="spread-view">
+    <div class="spread-picker">
+      <span class="spread-picker-label">Choose a spread</span>
+      <div class="spread-tabs" id="spread-tabs">
+      <button type="button" class="spread-tab" data-spread="0" onclick="selectSpread(0)"><span class="spread-tab-num">1</span>The Single Voice</button>
+      <button type="button" class="spread-tab active" data-spread="1" onclick="selectSpread(1)"><span class="spread-tab-num">3</span>Root, Voice & Path</button>
+      <button type="button" class="spread-tab" data-spread="2" onclick="selectSpread(2)"><span class="spread-tab-num">3</span>Cutting the Cord</button>
+      <button type="button" class="spread-tab" data-spread="3" onclick="selectSpread(3)"><span class="spread-tab-num">4</span>The Four Pillars</button>
+      <button type="button" class="spread-tab" data-spread="4" onclick="selectSpread(4)"><span class="spread-tab-num">5</span>The Ancestral Council</button>
+      </div>
+    </div>
+    <p class="spread-title" id="spread-title"></p>
+    <p class="spread-subtitle" id="spread-subtitle"></p>
+    <div class="spread-grid" id="spread-grid"></div>
+    <p class="spread-note" id="spread-note"></p>
+    <button class="btn btn-primary" onclick="newSpread()">New Spread</button>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav>
+    <button class="nav-btn active" id="nav-deck" onclick="switchView('deck')">
+      <span class="nav-icon">🃏</span>
+      <span class="nav-label">Draw</span>
+    </button>
+    <button class="nav-btn" id="nav-spread" onclick="switchView('spread')">
+      <span class="nav-icon">✦</span>
+      <span class="nav-label">Spread</span>
+    </button>
+    <button class="nav-btn" id="nav-all" onclick="switchView('all')">
+      <span class="nav-icon">🗂</span>
+      <span class="nav-label">All Cards</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+
+// -- CARD DATA --
+const CATEGORIES = ["Ancestral Archetypes & Guardians", "Sacred Traditions & Gatherings", "Lineage Lessons & Inheritance", "Divine Signs & Warnings"];
+
+const CAT_TABS = ["✦ Archetypes & Guardians", "◆ Traditions & Gatherings", "❖ Lessons & Inheritance", "✵ Signs & Warnings"];
+
+const CARDS = [
+  {"id": 1, "cat": 0, "name": "THE MATRIARCH", "keywords": "Unconditional love · Protection · Family healing · Foundation", "message": "Unconditional love, fierce protection, and healing energy anchor your foundation. Your ancestral mothers are embracing you.", "meaning": "The women who came before you are standing behind this reading. The Matriarch arrives when you need to be held rather than corrected — when the situation calls for warmth, patience and the kind of love that asks for nothing in return. She also speaks to your own role as an anchor: someone in your circle is drawing strength from your steadiness, whether or not they have said so. If there is a wound inside the family, healing begins at the level of care, not argument.", "reflection": "Who in my family line loved me without conditions — and how am I passing that same love forward?", "affirmation": "I am held by the love of the women who came before me."},
+  {"id": 2, "cat": 0, "name": "THE CHIEF", "keywords": "Leadership · Vision · Decisive action · Order", "message": "Leadership, vision, and decisive wisdom guide your path. It is time to step up and rule your own destiny.", "meaning": "You have been waiting for permission that is not coming. The Chief steps in when a situation has been drifting because no one has been willing to make the call — and the person meant to make it is you. This card asks for a long view rather than a reaction: decide where you want to be in three years, then govern today accordingly. Bring order to what is chaotic. Set the structure, name the direction, and take responsibility for the outcome. Authority feels heavy only until you accept it.", "reflection": "Where in my life am I waiting to be led, when I am the one meant to lead?", "affirmation": "I lead my own life with clarity and courage."},
+  {"id": 3, "cat": 0, "name": "THE ORACLE", "keywords": "Intuition · Inner knowing · Dreams · Sacred messages", "message": "Intuition, inner knowing, and sacred dreams hold the absolute truth. Trust the quiet whispers of your soul.", "meaning": "You already know. That is the whole message of this card. Somewhere beneath the second-guessing there is a first instinct you have been talking yourself out of, and it was correct. The Oracle sharpens your sensitivity for this season: dreams become more vivid, coincidences stack up, and you will catch a knowing about a person or an offer before any evidence arrives. Do not demand proof before you act on it. Write your dreams down for the next fourteen days — the guidance is being delivered in pieces.", "reflection": "What have I known all along but refused to say out loud?", "affirmation": "I trust the knowing that speaks before logic does."},
+  {"id": 4, "cat": 0, "name": "THE ARTISAN", "keywords": "Craft · Creation · Manifestation · Legacy work", "message": "Creativity, manifestation, and mastery born from dedicated labor. Build your lasting legacy with your own hands.", "meaning": "Stop planning and start making. The Artisan governs the part of destiny that only responds to hands, hours and repetition — nothing here arrives by wishing. Whatever you are being shown, the answer is to produce a first version of it, imperfect and real. This card frequently appears over creative work, small business, and anything you intend to leave behind you. The value of what you build will be measured in years, not in the reaction it gets this week.", "reflection": "What have I been designing in my head that my hands have not yet touched?", "affirmation": "I build my legacy with my own two hands."},
+  {"id": 5, "cat": 0, "name": "THE MEDICINE MAN", "keywords": "Healing · Restoration · Energy clearing · Old wounds", "message": "Deep restoration, alignment, and the easing of old burdens. Your mind, body, and bloodline are being healed.", "meaning": "Repair is already underway. The Medicine Man appears when something you have carried — in your body, your nervous system, or your family story — has begun to release, and your task is to cooperate with the process rather than rush it. Attend to the physical: rest, water, sunlight, a clean space, a doctor if one is needed. Old grief may surface for a few days; that is the medicine working, not a setback.", "reflection": "What am I ready to stop carrying, and what does my body need from me this week?", "affirmation": "My mind, my body and my bloodline are healing."},
+  {"id": 6, "cat": 0, "name": "THE STORYTELLER", "keywords": "History · Lessons · Communication · Transmission", "message": "Sacred history, timeless lessons, and ancestral lore. Look to the wisdom of the past to illuminate your present journey.", "meaning": "The answer you need is not new — it is in something that has already happened to you. The Storyteller asks you to go back before you go forward: review the last time you stood in a situation like this, and be honest about what you did and what it cost. There is also a call here to speak. Someone younger, newer or more frightened than you needs the version of the story you have never told. Your history is not embarrassing; it is curriculum.", "reflection": "What lesson from my past am I about to repeat instead of apply?", "affirmation": "My story carries wisdom worth passing on."},
+  {"id": 7, "cat": 0, "name": "THE WARRIOR", "keywords": "Courage · Boundaries · Protection · Breaking curses", "message": "Courage, unyielding boundaries, and the strength to break generational curses. Stand tall and defend your absolute truth.", "meaning": "Something in your life needs defending, and politeness has stopped working. The Warrior arrives to put steel in your spine: draw the line, say the hard sentence, and hold it without apologising for the third time. This card also speaks to generational patterns — the cycle that has repeated through your family may end with you, but only through deliberate confrontation, not avoidance. Fight clean and fight for something rather than against someone.", "reflection": "What boundary have I been too tired or too polite to enforce?", "affirmation": "I stand for my truth without apology."},
+  {"id": 8, "cat": 0, "name": "THE DIVINE TWIN", "keywords": "Balance · Duality · Partnership · Soul mirror", "message": "Divine balance, spiritual symmetry, and soul connections. Find perfect harmony within yourself to mirror it out to the world.", "meaning": "Two things must be held at once. The Divine Twin appears when you have been forcing an either/or onto a situation that is actually both — ambition and rest, loyalty and self-protection, softness and strength. In relationships, this card signals a true partner or counterpart: someone whose presence shows you yourself more clearly than solitude ever could. Pay attention to what irritates you in them; it is usually a disowned part of you asking to be integrated.", "reflection": "What quality in someone close to me am I refusing to recognise in myself?", "affirmation": "I hold both sides of my nature in balance."},
+  {"id": 9, "cat": 0, "name": "THE MIDWIFE", "keywords": "New beginnings · Safe transition · Birth · Support", "message": "New beginnings, safe transitions, and the birth of great potential. You are fully ready to deliver your next chapter.", "meaning": "Something is ready to come out of you. A project, a decision, a version of yourself that has been gestating quietly — the waiting phase is ending, and the delivery will be supported. The Midwife is a reassuring card in frightening transitions: you are not doing this alone, and the process, though intense, is safe. Accept the help being offered rather than proving you can manage unassisted.", "reflection": "What am I about to birth — and who is standing ready to help me if I ask?", "affirmation": "I am ready and supported as I begin again."},
+  {"id": 10, "cat": 0, "name": "THE FISHER", "keywords": "Patience · Divine timing · Subconscious depths · Waiting", "message": "Patience, divine timing, and harvesting deep emotional currents. Trust the stillness before the great abundance arrives.", "meaning": "You are not stuck; you are early. The Fisher governs the interval between casting and catching, and it counsels stillness where you want to thrash. Forcing a result now would scatter what is already moving towards you. Use the waiting well: the depths being referred to are your own, and what you draw up in a quiet week — an old memory, a resource you forgot you had, a truth about what you actually want — will be worth more than the outcome you were chasing.", "reflection": "What am I forcing that would arrive on its own if I let it?", "affirmation": "I trust the timing of what is coming to me."},
+  {"id": 11, "cat": 0, "name": "THE ALCHEMIST", "keywords": "Transformation · Turning pain to power · Resourcefulness · Survival", "message": "Turning deep pain into ultimate power and crisis into golden opportunity. You possess the magic to transform any situation.", "meaning": "The material you have been given is not good, and it is still enough. The Alchemist appears over hard circumstances to say plainly: this can be converted. The loss becomes the expertise. The betrayal becomes the boundary. The years that felt wasted become the thing that makes you impossible to replace. Take what is in your hands right now — including the pain — and put it to work.", "reflection": "What painful experience of mine is actually a form of gold I have not spent yet?", "affirmation": "I transform whatever I am given into power."},
+  {"id": 12, "cat": 0, "name": "THE GATEKEEPER", "keywords": "Divine protection · Timing · Closed doors · Spiritual filter", "message": "Divine protection, watchful boundaries, and spiritual alignment. Trust that some doors close only to keep you safe.", "meaning": "A door has closed, or is about to, and it is a mercy. The Gatekeeper decides what enters your life and what is turned away, and the refusal you are grieving was a protection you could not see the reason for yet. If you are waiting on an opportunity, the message is not never — it is not yet. Meanwhile, guard your own gate: who has access to your home, your energy and your plans is a spiritual decision, not a social one.", "reflection": "Which closed door am I still knocking on — and what might it be protecting me from?", "affirmation": "What is meant for me will open. What is not will stay shut."},
+  {"id": 13, "cat": 0, "name": "THE SCHOLAR", "keywords": "Study · Research · Hidden truth · Intellectual growth", "message": "Dedicated study, uncovering hidden truths, and intellectual expansion. The deep wisdom of your ancestry is being revealed.", "meaning": "Learn before you act. The Scholar appears when a situation has more beneath it than you have been told, and the advantage belongs to whoever does the reading. Ask the extra question. Check the document. Look into the family history you were told not to discuss. Something previously hidden is about to become visible, and it will reorganise your understanding of a person or a pattern.", "reflection": "What am I choosing not to look into, and why?", "affirmation": "Truth reveals itself to me as I seek it."},
+  {"id": 14, "cat": 0, "name": "THE NOMAD", "keywords": "Journey · Leaving comfort · Trust · Guidance", "message": "Fearless exploration, stepping out of comfort zones, and divine guidance. Trust the bright stars to lead you home.", "meaning": "The next chapter is not in this room. The Nomad calls for movement — sometimes literal relocation or travel, more often a departure from a role, a circle or a way of living that has become too small. You will not be given the full route before you leave; you will be given the next step and enough light to take it. What feels like uncertainty is the beginning of being guided.", "reflection": "What comfort am I clinging to that is quietly costing me my growth?", "affirmation": "I move forward guided, even when I cannot see the whole path."},
+  {"id": 15, "cat": 0, "name": "THE COUNSELOR", "keywords": "Justice · Karmic balance · Fair resolution · Agreements", "message": "Justice, fair resolution, and perfect karmic balance. Truth and alignment will prevail in all your contracts and agreements.", "meaning": "The scales are being levelled. The Counselor governs contracts, disputes, legal matters and the older accounting of cause and effect — and it favours whoever has been honest. If you are in a conflict, argue from principle rather than from injury and you will prevail. Where you have been wronged, resolution is closer than it appears; where you have been careless with someone, make it right before it is decided for you.", "reflection": "Where in my life do I need to make something fair — for someone else, or for myself?", "affirmation": "Truth and fairness work in my favour."},
+  {"id": 16, "cat": 1, "name": "THE SACRED FEAST", "keywords": "Abundance · Sharing · Nourishment · Celebration", "message": "Abundance, joy, and deep spiritual nourishment. Open your heart to celebrate the magnificent blessings coming your way.", "meaning": "There is enough, and you are allowed to enjoy it. The Sacred Feast arrives when you have been so focused on the next struggle that you have not stopped to receive what is already on the table. Gather people. Eat well. Mark the thing you achieved instead of moving straight to the next task. This card also predicts genuine increase, and reminds you that abundance shared multiplies while abundance hoarded curdles.", "reflection": "What blessing have I refused to celebrate because I was already worrying about the next thing?", "affirmation": "I receive abundance with an open heart and I share it freely."},
+  {"id": 17, "cat": 1, "name": "LINEAGE CIRCLE", "keywords": "Reconciliation · Family healing · Support · Unity", "message": "Reconciliation, healing ancestral friction, and absolute communal support. Generations of ancestors stand firmly behind you.", "meaning": "You are not the first person in your family to face this, and you are not facing it alone. Lineage Circle brings the whole line into the room — every generation that survived so that you could stand here. Practically, this card points to reconciliation: a conversation with a relative that has been postponed for years, or the quiet decision to stop keeping score. Where reconciliation is not safe, it asks instead for the chosen family who show up.", "reflection": "Which relationship in my family is asking to be repaired, and what would my first move be?", "affirmation": "Generations stand behind me, and I am never alone."},
+  {"id": 18, "cat": 1, "name": "THE POURING OF LIBATION", "keywords": "Honour · Gratitude · Offering · Sacred exchange", "message": "Honor, deep gratitude, and sacred ancestral reverence. Give before you request, and watch your paths open wide.", "meaning": "Give first. This card describes the oldest law of spiritual exchange: reverence opens the road, demand closes it. Before you ask the ancestors, the universe or another person for anything, offer something — gratitude spoken aloud, a portion of what you have, time given to someone who cannot repay you. There may also be an old promise here that you have not kept. Honour it now and watch how quickly things move afterwards.", "reflection": "What have I been asking for without offering anything in return?", "affirmation": "I give with honour, and the way opens before me."},
+  {"id": 19, "cat": 1, "name": "COUNCIL OF TRUTH", "keywords": "Honesty · Clearing the air · Wise counsel · Reason over emotion", "message": "Absolute honesty, deep mutual respect, and clearing away illusions. Let logic and collective wisdom prevail over passing emotion.", "meaning": "Have the conversation properly. Council of Truth calls for a real exchange — people sitting down, saying what is actually true, and listening without preparing a defence. The situation you are asking about will not be solved by hinting, by silence, or by telling everyone except the person concerned. Bring reason rather than heat, and bring someone wiser than you into the room if you can.", "reflection": "What truth am I hinting at instead of saying, and to whom?", "affirmation": "I speak plainly and I listen honestly."},
+  {"id": 20, "cat": 1, "name": "THE ANCESTRAL ALTAR", "keywords": "Intention · Prayer · Focus · Sacred space", "message": "Focused intention, sacred prayer, and a safe spiritual sanctuary. Your deepest requests have been heard by your guardians.", "meaning": "Your request has been received. The Ancestral Altar confirms that the thing you have been praying about is being worked on, and it asks you to hold focus rather than scatter your intention across ten different wants. Build the practice: a corner, a candle, photographs of your dead, a few minutes of daily attention. Sacred space is not decoration — it is the place where your mind stops negotiating and becomes single.", "reflection": "If I could only ask for one thing this season, what would it be?", "affirmation": "My prayers are heard and my intention is focused."},
+  {"id": 21, "cat": 1, "name": "THE FRONT PORCH SANCTUARY", "keywords": "Safe community · Watchfulness · Rest · Good counsel", "message": "Safe community, protective watchfulness, and restful clarity. Lean on the collective wisdom of those who truly care for you.", "meaning": "Someone who loves you has already told you the answer. This card describes the porch — the place between private and public where elders sit, watch the street, and say the obvious thing you have been too close to see. Go back to the advice you dismissed. It also gives permission to rest in plain sight of people who have your back; you do not have to be alert every hour.", "reflection": "Whose advice did I brush off recently that I should sit with again?", "affirmation": "I am watched over by people who genuinely want me well."},
+  {"id": 22, "cat": 1, "name": "PASSING OF THE MANTLE", "keywords": "Inheritance · Promotion · Responsibility · Leadership", "message": "Divine inheritance, promotion, and stepping into greater responsibility. You are ready to carry the torch of your lineage.", "meaning": "Something is being handed to you, and the correct response is to accept it. Passing of the Mantle covers promotions, new titles, and the less formal moment when a family or a team quietly begins to look to you first. You will feel unready. Everyone who ever received the mantle felt unready; the readiness is conferred by carrying it, not before. Say yes, then grow into the size of the thing.", "reflection": "What responsibility am I being offered that I keep insisting I am not ready for?", "affirmation": "I accept what is being handed to me and I carry it well."},
+  {"id": 23, "cat": 1, "name": "THE QUILTING CIRCLE", "keywords": "Patience · Collaboration · Craft · Building piece by piece", "message": "Patience, seamless collaboration, and piecing life together with intention. Collective efforts bring monumental rewards.", "meaning": "Small pieces, joined patiently, become something no single person could have made. The Quilting Circle appears when you are frustrated by slow progress, or when you have been trying to do alone what was designed to be done together. Divide the work. Accept that this month's contribution is one square, not the whole blanket. In partnerships this is an excellent omen.", "reflection": "What am I trying to complete alone that would go better with other hands on it?", "affirmation": "Piece by piece, together, we build something lasting."},
+  {"id": 24, "cat": 1, "name": "THE SACRED WASH", "keywords": "Release · Purification · Cleansing · Renewal", "message": "Emotional release, purification, and washing away the past. Your spirit is being completely renewed and cleansed.", "meaning": "Let it go down the drain. The Sacred Wash governs release — of an emotion you have been managing rather than feeling, of shame attached to something that was never your fault, of residue left on you by a person or a place. Water is the instruction here in the most practical sense: bathe deliberately, cry if it comes, clean your home, change the sheets. You are being made new, not merely tidied.", "reflection": "What am I still carrying that was never mine to carry?", "affirmation": "I release what is finished and I am made clean."},
+  {"id": 25, "cat": 1, "name": "RHYTHMS OF THE DRUM", "keywords": "Passion · Momentum · Right rhythm · Powerful action", "message": "Raw passion, matching the rhythm of life, and powerful movement. Let your heartbeat align with the pulse of the universe.", "meaning": "Find your tempo and move at it. Rhythms of the Drum is about pace as much as passion — you have either been dragging when the moment calls for force, or sprinting when your body is asking for a steadier beat. Notice which. This card carries strong momentum: action taken now travels further than usual, and enthusiasm you thought you had lost returns when you begin moving.", "reflection": "What makes my heart beat faster — and when did I last let it?", "affirmation": "I move in rhythm with my own life force."},
+  {"id": 26, "cat": 1, "name": "HOMECOMING RITUAL", "keywords": "Return · Identity · Belonging · Spirit recall", "message": "Reclaiming your identity, calling back your spirit, and finding your true grounding. Welcome home to your authentic self.", "meaning": "Come back to yourself. Homecoming Ritual appears after a period in which you shaped yourself around a job, a relationship or an environment until the original person got quiet. The card calls that person home — the interests, the humour, the standards, the way you dressed before you started managing other people's comfort. There may also be a literal return here, and you will be welcomed more warmly than you expect.", "reflection": "What part of me went quiet, and what would it take to call it back?", "affirmation": "I return to myself, and I am welcome here."},
+  {"id": 27, "cat": 1, "name": "FIRELIGHT VIGIL", "keywords": "Hope · Endurance · Solidarity · Keeping watch", "message": "Hope, resilience through dark times, and collective unity. Your inner flame will never be extinguished by external darkness.", "meaning": "The night is long, and the light is still burning. Firelight Vigil does not pretend the situation is easy; it promises that you will get through it and that you are not keeping watch alone. Others are holding a candle for you, some of them people you have not spoken to in years. Your task in this phase is endurance rather than breakthrough: keep the small flame going, hour by hour.", "reflection": "Who is holding a light for me right now, and have I let them know it matters?", "affirmation": "My flame endures every darkness."},
+  {"id": 28, "cat": 1, "name": "THE HARVEST CELEBRATION", "keywords": "Reward · Financial gain · Reaping · Fruition", "message": "Financial harvest, reaping well-deserved rewards, and massive abundance. The fruits of your labor are ready to be claimed.", "meaning": "Payment is due to you. The Harvest Celebration is one of the deck's most materially favourable cards: money owed arrives, work done long ago finally pays, a slow investment turns. What matters now is that you actually collect — send the invoice, name your price, accept the offer without shrinking it. Feeding others from your increase is how the next season's abundance is planted.", "reflection": "What am I owed — in money, credit or acknowledgement — that I have not claimed?", "affirmation": "I claim the harvest my work has earned."},
+  {"id": 29, "cat": 1, "name": "THE SUNDAY PROCESSION", "keywords": "Dignity · Pride · Presence · Self-respect", "message": "Dignity, cultural pride, and walking with absolute grace. Step forward with the confidence and posture of true royalty.", "meaning": "Carry yourself like the answer is already yes. The Sunday Procession is about bearing — how you enter a room, how you dress for the life you are asking for, how you refuse to shrink in spaces that were not built with you in mind. This is not vanity; it is a spiritual instruction. Dignity changes how situations resolve. Present yourself with care this week, particularly where you feel least entitled to.", "reflection": "Where do I make myself smaller than I am, and what would it look like to walk in at my full height?", "affirmation": "I move through the world with dignity and pride."},
+  {"id": 30, "cat": 1, "name": "THE MIDNIGHT CONJURE", "keywords": "Quiet work · Privacy · Focus · Silent manifestation", "message": "Silent manifestation, working behind the scenes, and deep focus. Let your final results speak for your quiet magic.", "meaning": "Say nothing yet. The Midnight Conjure protects work that is still forming — the plan, the application, the business, the exit — by keeping it out of other people's mouths. Announcing it now invites opinion, envy and dilution; finishing it first lets the result make the announcement for you. There is real power in a project no one is watching.", "reflection": "What am I telling people about that I should quietly finish instead?", "affirmation": "I work in silence and let my results speak."},
+  {"id": 31, "cat": 2, "name": "LEGACY OF ABUNDANCE", "keywords": "Wealth · Birthright · Opportunity · Financial destiny", "message": "Wealth, opportunity, and prosperity are your divine birthright. The ancestors are unlocking your financial destiny.", "meaning": "Prosperity is not something you must earn permission for. Legacy of Abundance addresses the inherited belief that money is dangerous, or that wanting more of it is disloyal to people who had less. Both ideas can be set down. A door is opening around income, business or opportunity, and the requirement is that you walk through it without apology. Name the number, ask for the raise, take the meeting.", "reflection": "What did my family teach me about money — and which of those beliefs still runs my decisions?", "affirmation": "Prosperity is my birthright and I claim it without guilt."},
+  {"id": 32, "cat": 2, "name": "ROOTS & ALCHEMY", "keywords": "Resourcefulness · Building from nothing · Wit · Survival wisdom", "message": "Resilience, wit, and building an empire out of nothing. You carry the hereditary power to turn dirt into gold.", "meaning": "Start with what you have, where you are. Roots and Alchemy is the card of people who have always made a way — the improvisation, the side hustle, the recipe built from what was left in the cupboard. You are being reminded that this intelligence is in you, and that waiting for ideal resources is the only real obstacle. Plant something small and unimpressive this week.", "reflection": "What could I begin right now with the imperfect resources already in my hands?", "affirmation": "I can build something from whatever I am given."},
+  {"id": 33, "cat": 2, "name": "SACRED DISCIPLINE", "keywords": "Consistency · Structure · Daily practice · Self-control", "message": "Consistency, self-control, and honoring the daily structure. Great success is built through sacred habits.", "meaning": "Luck is not what is required here — repetition is. Sacred Discipline appears when a goal you care about is being sabotaged not by circumstance but by inconsistency, and it prescribes the unglamorous remedy: same time, same action, every day, whether or not you feel like it. Treat the habit as a rite rather than a chore. Structure is a form of self-respect.", "reflection": "What one daily action, done for ninety days, would change my situation most?", "affirmation": "My discipline is sacred, and it is building my future."},
+  {"id": 34, "cat": 2, "name": "THE UNWRITTEN LAW", "keywords": "Integrity · Honour · Ethics · Doing right unseen", "message": "Integrity, honor, and doing what is right when no one is watching. Your character is your ultimate protective shield.", "meaning": "Character is being tested in a small, private way. The Unwritten Law arrives when there is an easy shortcut available that no one would ever discover — and it tells you plainly not to take it. Your reputation is a spiritual asset that compounds silently; one unnecessary compromise costs more than the shortcut saves. Keep your word this month even where it is inconvenient.", "reflection": "Where am I tempted to cut a corner because no one would ever know?", "affirmation": "My integrity is my protection."},
+  {"id": 35, "cat": 2, "name": "STANDARD OF EXCELLENCE", "keywords": "Distinction · Recognition · Achievement · Professional honour", "message": "Distinction, professional honor, and highest achievement. Rise to the absolute top of your calling with immense pride.", "meaning": "Aim higher than you were going to. Standard of Excellence indicates recognition arriving — an award, a qualification, a promotion, a public acknowledgement of work you thought went unnoticed — and instructs you not to submit anything mediocre in the meantime. This is a season for your best work, not your fastest. Apply for the position that seems a level above you.", "reflection": "Where have I been settling for good enough when excellent was within reach?", "affirmation": "I rise to the highest standard of my calling."},
+  {"id": 36, "cat": 2, "name": "BLOODLINE RESILIENCE", "keywords": "Endurance · Unbreakable spirit · Survival · Strength", "message": "Unbreakable spirit, enduring power, and conquering storms. You are descended from ultimate survivors and victors.", "meaning": "You come from people who could not be broken. Bloodline Resilience appears in the middle of the hard part, when you are privately wondering whether you can take much more — and its answer is yes, and it will not last forever. This is inherited strength, not performance: it does not require you to feel strong, only to remain standing. Stop apologising for how long the difficulty is taking.", "reflection": "What have I already survived that proves I can survive this?", "affirmation": "I come from survivors. I do not break."},
+  {"id": 37, "cat": 2, "name": "THE ANCIENT BLUEPRINT", "keywords": "Innate gifts · Destiny · Soul talent · Design", "message": "Innate gifts, soul talents, and destiny calling. Embrace the cosmic design embedded deeply within your bloodline.", "meaning": "The thing you are good at without trying is not an accident. The Ancient Blueprint asks you to take your natural gift seriously — the one you dismiss because it comes easily, or because no one in your family earned a living from it. Stop trying to succeed at the thing you are merely competent at and organise your life around the thing you are built for. Destiny repeats itself quietly until you notice.", "reflection": "What comes so naturally to me that I have never counted it as a talent?", "affirmation": "I was designed for something specific, and I am walking into it."},
+  {"id": 38, "cat": 2, "name": "INTEGRITY OF THE NAME", "keywords": "Reputation · Credibility · Brand · Your word", "message": "Credibility, honor, and building a timeless reputation. Your word is your greatest currency and asset.", "meaning": "Your name is doing work in rooms you are not in. Integrity of the Name is favourable for negotiations, contracts and public-facing work — an old kindness or a reputation for reliability is about to pay you back, possibly from an unexpected direction. Protect the asset: deliver what you promised, on the date you promised it, and be careful whose projects you attach your name to.", "reflection": "What do people say about me when I am not in the room — and is it what I intend?", "affirmation": "My name carries weight because I keep my word."},
+  {"id": 39, "cat": 2, "name": "GENERATIONAL HEALING", "keywords": "Breaking cycles · Ancestral wounds · Freedom · The chosen one", "message": "Breaking toxic cycles and healing ancient emotional wounds. You are chosen to set your entire lineage free.", "meaning": "The pattern stops with you. Generational Healing names the inherited behaviour that has moved down your family unexamined — the silence, the temper, the fear around money, the leaving — and confirms that you are the one who noticed it, which is why you are the one who ends it. Every conversation you have differently, every reaction you interrupt, frees someone not yet born.", "reflection": "What pattern from my family am I determined not to pass on, and what would breaking it require this week?", "affirmation": "The cycle ends with me, and my line goes free."},
+  {"id": 40, "cat": 2, "name": "ENDOWMENT OF GRACE", "keywords": "Composure · Calm · Mercy · Quiet strength", "message": "Calmness, emotional composure, and inner peace. Your gentle strength will naturally dismantle any opposition.", "meaning": "Do not match their energy. Endowment of Grace arrives during conflict to advise the harder and more effective response: stay composed, stay kind, and refuse to be pulled into a performance you did not choose. This is not weakness — it is the strategic knowledge that a calm person is impossible to manipulate. The situation will resolve in your favour largely because you did not make it worse.", "reflection": "Who is currently provoking me, and what would change if I simply declined to react?", "affirmation": "My calm is my strength, and my grace is my power."},
+  {"id": 41, "cat": 2, "name": "THE DEEP ROOTS", "keywords": "Stability · Long-term security · Assets · Foundations", "message": "Stability, long-term security, and building immovable assets. Your life foundation cannot be shaken by minor storms.", "meaning": "Build something that cannot be taken away. The Deep Roots turns attention to foundations — property, savings, long-term investment, ownership rather than rental, skills that belong to you rather than to a job title. It is a stabilising card: whatever is currently shaking is surface weather, and your base is sounder than your anxiety suggests. Choose the slower, more permanent option.", "reflection": "What am I building that will still be standing in twenty years?", "affirmation": "My roots run deep and nothing minor can move me."},
+  {"id": 42, "cat": 2, "name": "SPIRITUAL DOWRY", "keywords": "Intuition · Inherited gifts · Manifestation · The word", "message": "Heightened intuition, cosmic inheritance, and the power of manifestation. Use your natural gifts to shape your reality.", "meaning": "You inherited more than furniture. Spiritual Dowry speaks to the psychic and spiritual capacity that runs in your family — the relative who dreamed things before they happened, the grandmother whose blessings and warnings both came true. That inheritance is active in you and it strengthens when used. Speak carefully this season: your words carry more weight than usual.", "reflection": "Which of my relatives had the gift, and how does that same sensitivity show up in me?", "affirmation": "I carry a spiritual inheritance, and I use it well."},
+  {"id": 43, "cat": 2, "name": "MASTER OF THE CRAFT", "keywords": "Mastery · Expertise · Dedication · Authority", "message": "Absolute mastery, expertise, and ultimate dedication. Commit yourself to perfection and become a leading voice in your field.", "meaning": "Go deeper instead of wider. Master of the Craft appears when you are tempted to add another interest, another income stream, another half-learned skill — and it advises the opposite. Choose the one thing you are already good at and pursue it to the level where people come to you specifically. Refine the detail others skip. That is where authority is actually built.", "reflection": "What one skill would change my life most if I became genuinely excellent at it?", "affirmation": "I commit to my craft until mastery becomes undeniable."},
+  {"id": 44, "cat": 2, "name": "THE PROMISED LAND", "keywords": "Vision · Legacy planning · The long view · Provision", "message": "Long-term vision, legacy planning, and sustainable building. What you create today will feed generations to come.", "meaning": "Think in decades. The Promised Land lifts your eyes off this month's problem and towards the life you intend to hand over — property, a business that outlives you, successors who inherit something more than debt. Some of what you are building now you will not personally enjoy, and that is exactly the point. Make one long-range decision this season.", "reflection": "What am I building that is meant for people who come after me?", "affirmation": "I plant for a harvest that will feed generations."},
+  {"id": 45, "cat": 2, "name": "WISDOM OF THE HEARTH", "keywords": "Home · Domestic peace · Sanctuary · Restoration", "message": "Domestic peace, home sanctuary, and nurturing your private space. Your home is the sacred source of your power.", "meaning": "Fix the house and the rest steadies. Wisdom of the Hearth points to your private space as the source of your power rather than a place you merely sleep. If the home is chaotic, tense or neglected, your performance everywhere else is being taxed by it. Cook something. Clear the room that has become storage. A settled hearth sends you out charged rather than depleted.", "reflection": "Does my home restore me or drain me — and what one change would shift that?", "affirmation": "My home is sacred ground, and it restores my power."},
+  {"id": 46, "cat": 3, "name": "THE CROSSROADS", "keywords": "Choice · Turning point · Decision · Soul growth", "message": "Significant turning points and critical choices. Trust your soul's growth and alignment over the easy path.", "meaning": "A genuine decision is in front of you and delay is now itself a decision. The Crossroads brings reassurance and a criterion: there is no wrong road here, only different curricula, so choose the path on which you become more yourself rather than the one that is simply easier to explain. Fear and intuition feel similar in the body but point differently — fear says stay small, intuition says go carefully.", "reflection": "Of my two options, which would I choose if I were not afraid of what people would say?", "affirmation": "I choose the road that grows my soul."},
+  {"id": 47, "cat": 3, "name": "BLOODLINE SHIELD", "keywords": "Protection · Spiritual defence · Safety · Guardianship", "message": "Supreme spiritual protection. You are fiercely guarded against all negativity, ill intent, and hidden malice.", "meaning": "You are covered. Bloodline Shield arrives when you have been anxious about ill intent — gossip, envy, someone working against you, a fear you cannot quite name — and it confirms a wall of protection around you that predates your birth. Stop rehearsing worst cases and put the energy back into your own work. Where practical protection is also needed, take it calmly and without panic.", "reflection": "What have I been fearing that I can now put down?", "affirmation": "I am shielded by every generation that came before me."},
+  {"id": 48, "cat": 3, "name": "DIVINE SILENCE", "keywords": "Restraint · Listening · Stillness · Not reacting", "message": "Silence is your ultimate weapon. Speak less, observe more, and let your energy settle in absolute stillness.", "meaning": "Do not respond. Divine Silence appears when you are being baited, or when you are about to explain yourself to someone who has already decided. Your quiet is stronger than any sentence you could construct — it denies fuel, protects information, and lets the other party reveal themselves. The most important thing you learn this season will be something you overhear rather than ask for.", "reflection": "What am I about to say that would serve me better unsaid?", "affirmation": "My silence is powerful and it protects me."},
+  {"id": 49, "cat": 3, "name": "THE WATCHMAN", "keywords": "Vigilance · Awareness · Guardianship · Night protection", "message": "Watchfulness, spiritual vigilance, and protection over your domain. Guardians are keeping watch through your darkest nights.", "meaning": "Stay alert without becoming afraid. The Watchman has two faces: an ancestral guardian patrolling your home while you are at your most vulnerable, and a warning that you should be paying closer attention than you have been. Check what you have been leaving unlocked — literally, financially, or in terms of who has access to your affairs.", "reflection": "What in my life have I stopped paying attention to that deserves a closer look?", "affirmation": "I am watched over, and I remain awake to my own life."},
+  {"id": 50, "cat": 3, "name": "THE SEVERED CORD", "keywords": "Cutting ties · Ending · Energy reset · Freedom", "message": "Cutting ties with toxic attachments and resetting your energy. Reclaim your total freedom without looking back.", "meaning": "The connection has to be cut, not managed. The Severed Cord addresses the relationship, habit or obligation you keep trying to reduce to a survivable level when it needs to end entirely. You have already had the evidence; what has been missing is the willingness to accept the loss. Cut cleanly rather than in stages — half-endings keep the drain open.", "reflection": "What or who am I still half-attached to, and what would a clean ending look like?", "affirmation": "I cut what drains me and I reclaim my freedom."},
+  {"id": 51, "cat": 3, "name": "THE GATHERING STORM", "keywords": "Warning · Incoming turbulence · Preparation · Clearing", "message": "Impending chaos or transition. Stay calm and centered; the storm comes only to clear away what no longer serves you.", "meaning": "Weather is coming, and you have been given notice. The Gathering Storm predicts conflict, disruption or a difficult revelation — not to frighten you, but so that you prepare while the sky is still clear. Get your affairs in order: savings, documents, conversations you have been avoiding. What this storm destroys will be things that were already unsound.", "reflection": "If disruption arrived next month, what would I wish I had prepared this week?", "affirmation": "I prepare calmly, and the storm clears my path."},
+  {"id": 52, "cat": 3, "name": "THE WHISPERING WIND", "keywords": "Signs · Synchronicity · Intuition · Subtle messages", "message": "Heightened awareness and signs from your environment. Pay close attention to the synchronicities appearing around you.", "meaning": "Pay attention to the small things. The Whispering Wind confirms that the repeated song, the name that keeps appearing, the sudden reluctance about a plan — these are messages rather than coincidences. Your ancestors rarely announce; they nudge. Write down what recurs over the next week and the pattern will assemble itself into a clear instruction.", "reflection": "What has been repeating around me lately that I have been treating as coincidence?", "affirmation": "I notice the signs, and I understand what they are telling me."},
+  {"id": 53, "cat": 3, "name": "THE HIDDEN SERPENT", "keywords": "Deception · Envy · False friends · Caution", "message": "Deception, hidden jealousy, and false intentions. Walk carefully and protect your energy from smiling masks.", "meaning": "Someone close is not what they present. The Hidden Serpent is a direct warning about a person in your circle — pleasant to your face, working against you elsewhere, motivated usually by envy rather than hatred. You have likely felt it already and talked yourself out of it. Do not accuse; simply stop supplying information and watch how their behaviour changes.", "reflection": "Whose presence leaves me subtly drained or second-guessing myself?", "affirmation": "I see clearly, and I protect what is mine."},
+  {"id": 54, "cat": 3, "name": "THE FADING LIGHT", "keywords": "Pause · Retreat · Rest · Strategic withdrawal", "message": "Time to pause, rest, and retreat. Do not force progress when the universe calls for absolute stillness.", "meaning": "Stop pushing. The Fading Light appears when persistence has stopped being a virtue and become a drain — the door is not opening today, and continuing to shoulder it will only cost you the strength you will need when it does. Withdraw deliberately rather than collapsing later. Stepping back is a strategy here, not a surrender.", "reflection": "What am I forcing that I should set down for now?", "affirmation": "I rest without guilt, and I return stronger."},
+  {"id": 55, "cat": 3, "name": "THE UNMASKED TRUTH", "keywords": "Revelation · Illusion breaking · Clarity · Honesty", "message": "Illusions shattering and true motives being revealed. The truth may sting initially, but it will set you free.", "meaning": "You are about to see something clearly. The Unmasked Truth removes an illusion — about a person's motives, a situation you have been given a partial account of, or a story you have been telling yourself. The initial reaction is usually pain, quickly followed by relief. Do not rush to react in the first twenty-four hours; let the information settle.", "reflection": "What truth am I bracing against — and how much energy is that bracing costing me?", "affirmation": "I would rather see clearly than be comfortable."},
+  {"id": 56, "cat": 3, "name": "THE ANCESTRAL OMEN", "keywords": "Dreams · Signs · Divine messages · Decoding", "message": "Sacred dreams, recurring signs, and divine messages. Take time to decode the spiritual codes being sent to you.", "meaning": "A message is being delivered through symbols. The Ancestral Omen intensifies dream life and marks unusual encounters — a particular bird, a repeated number, a deceased relative appearing vividly in sleep. Keep a notebook by the bed for the next two weeks and record everything on waking. The meaning tends to assemble across several nights rather than in one.", "reflection": "What have I dreamed recently that I dismissed on waking?", "affirmation": "I receive and understand the messages sent to me."},
+  {"id": 57, "cat": 3, "name": "THE SHIFTING TIDE", "keywords": "Change · Reversal · Adaptability · Fortune turning", "message": "Rapidly changing fates and shifting situations. Stay flexible, fluid, and ready to ride the waves of change.", "meaning": "Conditions are about to change quickly, in either direction. The Shifting Tide warns against building on the assumption that the current advantage will hold — and equally against despairing over a difficulty that is already loosening. Keep your commitments light, your plans revisable, and your reactions slow.", "reflection": "Where am I depending on things staying exactly as they are?", "affirmation": "I move with change instead of against it."},
+  {"id": 58, "cat": 3, "name": "THE BROKEN THRESHOLD", "keywords": "Boundaries · Intrusion · Protection · Saying no", "message": "Boundaries crossed or spiritual intrusions. Re-establish your limits firmly and guard your sacred space.", "meaning": "A line has been crossed and not addressed. The Broken Threshold points to someone helping themselves to your time, your resources, your home or your emotional labour because the last few incursions passed without comment. Repair the doorway: say the direct sentence, restate the rule, and enforce it once so that it is understood.", "reflection": "Which boundary of mine has been quietly crossed, and how do I restate it clearly?", "affirmation": "I guard my threshold, and I decide who enters."},
+  {"id": 59, "cat": 3, "name": "THE SACRED FIRE", "keywords": "Purification · Burning away · Endings · Rebirth", "message": "Complete purification and burning away the old. Out of the ashes, your new life will gracefully and powerfully rise.", "meaning": "Let it burn. The Sacred Fire governs the ending that cannot be repaired, negotiated or reversed — and insists that the destruction is purposeful. What is being taken was already finished; grieving it is right, rebuilding it is not. Give it to the fire deliberately rather than clinging while it goes.", "reflection": "What am I trying to rescue that would serve me better as ash?", "affirmation": "I release the old to the fire and I rise renewed."},
+  {"id": 60, "cat": 3, "name": "THE GOLDEN HORIZON", "keywords": "Triumph · Blessing · New era · The long night ending", "message": "Ultimate triumph, infinite blessings, and entering your golden era. The storm has passed; walk proudly into your victory.", "meaning": "The hard season is ending. The Golden Horizon is the deck's final and most generous card: what you endured has been counted, and a genuinely better chapter is opening — not as a reward for suffering, but as its natural conclusion. Walk into it proudly, and tell the people who stayed with you through the dark what it meant.", "reflection": "What am I finally ready to walk out of — and what does my golden era actually look like?", "affirmation": "The long night is over. I walk into my golden era."}
+];
+
+// -- DECK STATE --
+let shuffledDeck = [...CARDS];
+let drawnIndex = 0;
+let currentCard = null;
+let currentView = 'deck';
+const STORE = 'voa_';
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// -- ACCESS CONTROL --
+const VALID_CODE = 'VOICE2026';
+
+function unlock() {
+  document.getElementById('access-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  initDeck();
+}
+
+function checkCode() {
+  var rawInput = document.getElementById('code-input').value;
+  var input = rawInput.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (input === VALID_CODE) {
+    try { localStorage.setItem(STORE + 'unlocked', '1'); } catch (e) {}
+    unlock();
+  } else {
+    var err = document.getElementById('error-msg');
+    err.style.display = 'block';
+    document.getElementById('code-input').style.borderColor = '#e08a6f';
+    setTimeout(function() {
+      err.style.display = 'none';
+      document.getElementById('code-input').style.borderColor = '';
+    }, 3000);
+  }
+}
+
+document.getElementById('code-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') checkCode();
+});
+
+// -- INIT --
+function initDeck() {
+  shuffledDeck = shuffleArray([...CARDS]);
+  drawnIndex = 0;
+  [updateCounter, buildCategoryTabs, () => buildAllCards(CARDS), initSpread]
+    .forEach(step => { try { step(); } catch (e) { console.error('init step failed:', e); } });
+}
+
+function updateCounter() {
+  const remaining = shuffledDeck.length - drawnIndex;
+  document.getElementById('counter').textContent = `${remaining} Cards`;
+}
+
+// -- VIEWS --
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+  document.getElementById('deck-view').style.display = 'none';
+  document.getElementById('card-view').style.display = 'none';
+  document.getElementById('all-cards-view').style.display = 'none';
+  document.getElementById('spread-view').style.display = 'none';
+
+  if (view === 'deck') {
+    document.getElementById('deck-view').style.display = 'flex';
+    document.getElementById('nav-deck').classList.add('active');
+  } else if (view === 'card') {
+    document.getElementById('card-view').style.display = 'flex';
+    document.getElementById('nav-deck').classList.add('active');
+  } else if (view === 'all') {
+    document.getElementById('all-cards-view').style.display = 'flex';
+    document.getElementById('nav-all').classList.add('active');
+  } else if (view === 'spread') {
+    document.getElementById('spread-view').style.display = 'flex';
+    document.getElementById('nav-spread').classList.add('active');
+  }
+}
+
+function showDeck() { switchView('deck'); }
+
+// -- SHUFFLE --
+function shuffleDeck() {
+  const pile = document.getElementById('deck-pile');
+  pile.classList.add('shuffling');
+  setTimeout(() => { pile.classList.remove('shuffling'); }, 1800);
+  shuffledDeck = shuffleArray([...CARDS]);
+  drawnIndex = 0;
+  updateCounter();
+}
+
+// -- DRAW --
+function drawCard() {
+  if (drawnIndex >= shuffledDeck.length) {
+    shuffledDeck = shuffleArray([...CARDS]);
+    drawnIndex = 0;
+  }
+  currentCard = shuffledDeck[drawnIndex++];
+  updateCounter();
+  showCardUnrevealed(currentCard);
+  document.getElementById('drawn-count').textContent = `Card ${drawnIndex} of ${CARDS.length}`;
+  switchView('card');
+}
+
+function showCardUnrevealed(card) {
+  cardRevealed = false;
+  const backEl = document.getElementById('card-back-el');
+  const faceEl = document.getElementById('card-face');
+  backEl.style.display = 'flex';
+  faceEl.style.display = 'none';
+  renderCardFace(card, faceEl);
+  document.getElementById('reading-panel').style.display = 'none';
+  document.getElementById('reading-panel').innerHTML = '';
+  document.getElementById('reading-hint').style.display = 'none';
+}
+
+function renderCardFace(card, el) {
+  const imgSrc = `${card.id}.webp`;
+  el.innerHTML = `<img src="${imgSrc}" alt="${card.name}" onerror="this.onerror=null; this.src='';">`;
+}
+
+function renderReadingPanel(card) {
+  const panel = document.getElementById('reading-panel');
+  panel.innerHTML = `
+    <div class="reading-category">${CATEGORIES[card.cat]}</div>
+    <div class="reading-name">${card.name}</div>
+    <div class="reading-keywords">${card.keywords}</div>
+    <div class="card-section-label">✦ The Message</div>
+    <div class="card-message">${card.message}</div>
+    <div class="card-section-label">◆ The Deeper Meaning</div>
+    <div class="card-meaning">${card.meaning}</div>
+    <div class="card-section-label">❖ Sit With This</div>
+    <div class="card-reflection">${card.reflection}</div>
+    <div class="card-affirmation">“${card.affirmation}”</div>
+    <div class="card-footer-brand">PsychicSoulStar · Voices of the Ancestors Oracle</div>
+  `;
+  panel.style.display = 'block';
+  document.getElementById('reading-hint').style.display = 'block';
+}
+
+let cardRevealed = false;
+
+function flipCard() {
+  if (!currentCard) return;
+  if (cardRevealed) {
+    cardRevealed = false;
+    document.getElementById('card-back-el').style.display = 'flex';
+    document.getElementById('card-face').style.display = 'none';
+    document.getElementById('reading-panel').style.display = 'none';
+    document.getElementById('reading-hint').style.display = 'none';
+    return;
+  }
+  cardRevealed = true;
+  document.getElementById('card-back-el').style.display = 'none';
+  document.getElementById('card-face').style.display = 'block';
+  renderReadingPanel(currentCard);
+}
+
+// -- ALL CARDS --
+let activeCategory = 'all';
+
+function buildCategoryTabs() {
+  const container = document.getElementById('cat-tabs');
+  container.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'cat-tab active';
+  allBtn.textContent = 'All';
+  allBtn.onclick = () => filterByCategory('all', allBtn);
+  container.appendChild(allBtn);
+
+  CATEGORIES.forEach((name, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-tab';
+    btn.textContent = CAT_TABS[i];
+    btn.onclick = () => filterByCategory(i, btn);
+    container.appendChild(btn);
+  });
+}
+
+function filterByCategory(cat, btn) {
+  activeCategory = cat;
+  document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterCards(document.getElementById('search-input').value);
+}
+
+function filterCards(term) {
+  if (term === undefined) term = document.getElementById('search-input').value;
+  const lower = term.toLowerCase();
+  const filtered = CARDS.filter(c => {
+    const matchCat = activeCategory === 'all' || c.cat === activeCategory;
+    const matchSearch = !lower || c.name.toLowerCase().includes(lower) ||
+      c.message.toLowerCase().includes(lower) || c.keywords.toLowerCase().includes(lower) ||
+      c.meaning.toLowerCase().includes(lower);
+    return matchCat && matchSearch;
+  });
+  buildAllCards(filtered);
+}
+
+function buildAllCards(cards) {
+  const grid = document.getElementById('cards-grid');
+  grid.innerHTML = '';
+  cards.forEach(card => {
+    const el = document.createElement('div');
+    el.className = 'mini-card';
+    el.onclick = () => openCardFromList(card);
+    el.innerHTML = `
+      <div class="mini-card-num">#${card.id} · ${CATEGORIES[card.cat]}</div>
+      <div class="mini-card-name">${card.name}</div>
+      <div class="mini-card-truth">${card.keywords}</div>
+    `;
+    grid.appendChild(el);
+  });
+}
+
+function openCardFromList(card) {
+  currentCard = card;
+  showCardUnrevealed(card);
+  document.getElementById('drawn-count').textContent = `Card #${card.id}`;
+  switchView('card');
+  flipCard();
+}
+
+// -- SPREADS --
+const SPREADS = [
+  {
+    "title": "The Single Voice",
+    "sub": "One card · Daily guidance",
+    "note": "The best way to learn this deck. Read the message, then sit with the question.",
+    "byPillar": false,
+    "positions": [
+      {
+        "name": "Today's Voice",
+        "hint": "what I most need to hear now"
+      }
+    ]
+  },
+  {
+    "title": "Root, Voice & Path",
+    "sub": "Three cards · The core spread",
+    "note": "The story between the cards usually matters more than any single meaning.",
+    "byPillar": false,
+    "positions": [
+      {
+        "name": "The Root",
+        "hint": "what this situation grows from"
+      },
+      {
+        "name": "The Voice",
+        "hint": "what the ancestors are saying now"
+      },
+      {
+        "name": "The Path",
+        "hint": "the action they are pointing to"
+      }
+    ]
+  },
+  {
+    "title": "Cutting the Cord",
+    "sub": "Three cards · For release work",
+    "note": "Follow this reading with something your hands can do — a bath, a letter torn, a message sent.",
+    "byPillar": false,
+    "positions": [
+      {
+        "name": "What Holds Me",
+        "hint": "the true nature of the attachment"
+      },
+      {
+        "name": "What It Costs",
+        "hint": "what continuing will take from you"
+      },
+      {
+        "name": "What Replaces It",
+        "hint": "what moves in once you let go"
+      }
+    ]
+  },
+  {
+    "title": "The Four Pillars",
+    "sub": "Four cards · Seasonal reading",
+    "note": "Read the four together before you read them apart. The balance describes your season.",
+    "byPillar": true,
+    "positions": [
+      {
+        "name": "Pillar One",
+        "hint": "who I must be this season"
+      },
+      {
+        "name": "Pillar Two",
+        "hint": "what practice will carry me"
+      },
+      {
+        "name": "Pillar Three",
+        "hint": "what I am building and inheriting"
+      },
+      {
+        "name": "Pillar Four",
+        "hint": "what to watch along the way"
+      }
+    ]
+  },
+  {
+    "title": "The Ancestral Council",
+    "sub": "Five cards · For major decisions",
+    "note": "Reserve this for genuine crossroads. The Warning arrives early so you still have room to move.",
+    "byPillar": false,
+    "positions": [
+      {
+        "name": "The Matter",
+        "hint": "the true heart of the question"
+      },
+      {
+        "name": "The Elder",
+        "hint": "the wisdom being offered"
+      },
+      {
+        "name": "The Warning",
+        "hint": "what to watch, avoid or protect"
+      },
+      {
+        "name": "The Blessing",
+        "hint": "the support already available"
+      },
+      {
+        "name": "The Outcome",
+        "hint": "where this leads if you listen"
+      }
+    ]
+  }
+];
+
+let activeSpread = 1;                 // Root, Voice & Path by default
+let spreadCards = [];
+let spreadRevealed = [];
+
+function initSpread() {
+  markActiveTab();
+  newSpread();
+}
+
+function markActiveTab() {
+  document.querySelectorAll('#spread-tabs .spread-tab').forEach(b => {
+    b.classList.toggle('active', Number(b.dataset.spread) === activeSpread);
+  });
+}
+
+function selectSpread(i) {
+  if (i === null || isNaN(i) || i < 0 || i >= SPREADS.length) return;
+  activeSpread = i;
+  markActiveTab();
+  newSpread();
+}
+
+// one listener on the container - survives any re-render of the buttons
+document.getElementById('spread-tabs').addEventListener('click', function (e) {
+  const btn = e.target.closest('.spread-tab');
+  if (btn) selectSpread(Number(btn.dataset.spread));
+});
+
+function newSpread() {
+  const sp = SPREADS[activeSpread];
+  const n = sp.positions.length;
+  if (sp.byPillar) {
+    // one card from each pillar, in pillar order
+    spreadCards = sp.positions.map((_, i) =>
+      shuffleArray(CARDS.filter(c => c.cat === i))[0]);
+  } else {
+    spreadCards = shuffleArray([...CARDS]).slice(0, n);
+  }
+  spreadRevealed = new Array(n).fill(false);
+  document.getElementById('spread-title').textContent = sp.title;
+  document.getElementById('spread-subtitle').textContent = sp.sub;
+  document.getElementById('spread-note').textContent = sp.note;
+  renderSpread();
+}
+
+// -- AUTO-UNLOCK: defined here, called at the very end of this script, because
+// unlock() reaches into consts that are declared further down.
+function autoUnlock() {
+  try {
+    if (localStorage.getItem(STORE + 'unlocked') === '1') unlock();
+  } catch (e) {
+    console.error('auto-unlock failed:', e);
+  }
+}
+
+function renderSpread() {
+  const sp = SPREADS[activeSpread];
+  const n = sp.positions.length;
+  const grid = document.getElementById('spread-grid');
+  const cols = n === 1 ? 1 : (n === 4 ? 2 : 3);
+  grid.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+  grid.style.maxWidth = (n === 1 ? '200px' : (n === 4 ? '360px' : '500px'));
+  grid.innerHTML = '';
+
+  spreadCards.forEach((card, i) => {
+    const slot = document.createElement('div');
+    if (spreadRevealed[i]) {
+      slot.className = 'spread-card-slot revealed';
+      slot.innerHTML = `
+        <div class="spread-slot-label">${sp.positions[i].name}</div>
+        <div class="spread-slot-hint">${sp.positions[i].hint}</div>
+        <div class="spread-slot-name">${card.name}</div>
+        <div class="spread-slot-truth">${card.message}</div>
+      `;
+      slot.onclick = () => openCardFromList(card);
+    } else {
+      slot.className = 'spread-card-slot unrevealed';
+      slot.innerHTML = `<img src="card_back.webp" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="this.outerHTML='<span class=&quot;spread-mark&quot;>✦</span>';">`;
+      slot.onclick = () => { spreadRevealed[i] = true; renderSpread(); };
+    }
+    grid.appendChild(slot);
+  });
+}
+
+autoUnlock();
+
+</script>
+</body>
+</html>
